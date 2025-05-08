@@ -1,0 +1,116 @@
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.concert.grpc";
+option java_outer_classname = "CoordinationProto";
+
+package concert;
+
+// System Coordination Service - Handles inter-node communication
+service SystemCoordinationService {
+  // Two-Phase Commit Protocol
+  rpc Prepare(PrepareRequest) returns (PrepareResponse) {}
+  rpc Commit(CommitRequest) returns (CommitResponse) {}
+  rpc Abort(AbortRequest) returns (AbortResponse) {}
+
+  // Node Status and Discovery
+  rpc RegisterNode(NodeRegistrationRequest) returns (NodeRegistrationResponse) {}
+  rpc GetActiveNodes(ActiveNodesRequest) returns (ActiveNodesResponse) {}
+
+  // Data Synchronization
+  rpc SyncData(SyncDataRequest) returns (SyncDataResponse) {}
+}
+
+// Operation types for two-phase commit
+enum OperationType {
+  ADD_CONCERT = 0;
+  UPDATE_CONCERT = 1;
+  CANCEL_CONCERT = 2;
+  MAKE_RESERVATION = 3;
+  CANCEL_RESERVATION = 4;
+  UPDATE_INVENTORY = 5;
+  UPDATE_PRICING = 6;
+  MAKE_BULK_RESERVATION = 7;
+}
+
+// Request for prepare phase of 2PC
+message PrepareRequest {
+  string transaction_id = 1;
+  OperationType operation_type = 2;
+  bytes operation_data = 3;  // Serialized operation details
+}
+
+// Response for prepare phase
+message PrepareResponse {
+  bool vote_commit = 1;
+  string message = 2;
+}
+
+// Request for commit phase of 2PC
+message CommitRequest {
+  string transaction_id = 1;
+}
+
+// Response for commit phase
+message CommitResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Request for abort phase of 2PC
+message AbortRequest {
+  string transaction_id = 1;
+}
+
+// Response for abort phase
+message AbortResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Node information
+message Node {
+  string id = 1;
+  string host = 2;
+  int32 port = 3;
+  bool is_leader = 4;
+}
+
+// Request to register a node
+message NodeRegistrationRequest {
+  Node node = 1;
+}
+
+// Response to node registration
+message NodeRegistrationResponse {
+  bool success = 1;
+  string message = 2;
+  Node leader_node = 3;
+}
+
+// Request to get active nodes
+message ActiveNodesRequest {
+  // Empty request
+}
+
+// Response with active nodes
+message ActiveNodesResponse {
+  repeated Node nodes = 1;
+  Node leader_node = 2;
+}
+
+// Request to synchronize data
+message SyncDataRequest {
+  string node_id = 1;
+  string from_timestamp = 2;  // Get data updated after this timestamp
+}
+
+// Response with synchronized data
+message SyncDataResponse {
+  bool success = 1;
+  string message = 2;
+  bytes concerts_data = 3;  // Serialized concerts data
+  bytes reservations_data = 4;  // Serialized reservations data
+  string current_timestamp = 5;
+}

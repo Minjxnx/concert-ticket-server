@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.concert.grpc";
+option java_outer_classname = "TicketProto";
+
+package concert;
+
+// Ticket Inventory Service - Manages ticket availability
+service TicketInventoryService {
+  // Update ticket inventory (add or remove tickets)
+  rpc UpdateTicketInventory(TicketInventoryRequest) returns (TicketInventoryResponse) {}
+
+  // Get ticket availability for a concert
+  rpc GetTicketAvailability(ConcertIdRequest) returns (TicketAvailabilityResponse) {}
+
+  // Update ticket pricing
+  rpc UpdateTicketPricing(TicketPricingRequest) returns (TicketPricingResponse) {}
+}
+
+// Request to update ticket inventory
+message TicketInventoryRequest {
+  string concert_id = 1;
+  string seat_tier = 2;
+  int32 quantity = 3;  // Positive to add, negative to remove
+  bool is_after_party = 4;
+}
+
+// Response to ticket inventory update
+message TicketInventoryResponse {
+  bool success = 1;
+  string message = 2;
+  int32 updated_quantity = 3;
+}
+
+// Request for a specific concert by ID (reused from concert.proto)
+message ConcertIdRequest {
+  string concert_id = 1;
+}
+
+// Response with ticket availability details
+message TicketAvailabilityResponse {
+  string concert_id = 1;
+  repeated SeatTierAvailability seat_tiers = 2;
+  int32 after_party_tickets = 3;
+  bool success = 4;
+  string message = 5;
+}
+
+// Seat tier availability details
+message SeatTierAvailability {
+  string name = 1;
+  int32 available_seats = 2;
+  double price = 3;
+}
+
+// Request to update ticket pricing
+message TicketPricingRequest {
+  string concert_id = 1;
+  string seat_tier = 2;
+  double new_price = 3;
+}
+
+// Response to ticket pricing update
+message TicketPricingResponse {
+  bool success = 1;
+  string message = 2;
+  double updated_price = 3;
+}

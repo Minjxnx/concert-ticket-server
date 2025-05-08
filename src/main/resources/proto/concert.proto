@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.concert.grpc";
+option java_outer_classname = "ConcertProto";
+
+package concert;
+
+// Concert Service - Manages concert events
+service ConcertService {
+  // Add a new concert to the system
+  rpc AddConcert(ConcertRequest) returns (ConcertResponse) {}
+
+  // Update an existing concert's details
+  rpc UpdateConcert(ConcertRequest) returns (ConcertResponse) {}
+
+  // Cancel a concert
+  rpc CancelConcert(ConcertIdRequest) returns (StatusResponse) {}
+
+  // Get concert details
+  rpc GetConcert(ConcertIdRequest) returns (ConcertResponse) {}
+
+  // List all available concerts
+  rpc ListConcerts(ListConcertsRequest) returns (ListConcertsResponse) {}
+}
+
+// Concert entity
+message Concert {
+  string id = 1;
+  string name = 2;
+  string date = 3;
+  string venue = 4;
+  string description = 5;
+  bool has_after_party = 6;
+  int32 after_party_tickets = 7;
+  repeated SeatTier seat_tiers = 8;
+  bool is_cancelled = 9;
+}
+
+// Seat tier details
+message SeatTier {
+  string name = 1;  // e.g., "Regular", "VIP"
+  double price = 2;
+  int32 total_seats = 3;
+  int32 available_seats = 4;
+}
+
+// Request to add or update a concert
+message ConcertRequest {
+  Concert concert = 1;
+}
+
+// Response containing concert details
+message ConcertResponse {
+  Concert concert = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+// Request for a specific concert by ID
+message ConcertIdRequest {
+  string concert_id = 1;
+}
+
+// Generic status response
+message StatusResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Request to list concerts
+message ListConcertsRequest {
+  bool include_cancelled = 1;
+}
+
+// Response with a list of concerts
+message ListConcertsResponse {
+  repeated Concert concerts = 1;
+}

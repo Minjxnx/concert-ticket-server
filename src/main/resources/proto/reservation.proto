@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.concert.grpc";
+option java_outer_classname = "ReservationProto";
+
+package concert;
+
+// Reservation Service - Handles ticket reservations
+service ReservationService {
+  // Make a reservation for concert tickets
+  rpc MakeReservation(ReservationRequest) returns (ReservationResponse) {}
+
+  // Cancel a reservation
+  rpc CancelReservation(ReservationIdRequest) returns (StatusResponse) {}
+
+  // Get reservation details
+  rpc GetReservation(ReservationIdRequest) returns (ReservationResponse) {}
+
+  // Make a bulk reservation (for event coordinators)
+  rpc MakeBulkReservation(BulkReservationRequest) returns (BulkReservationResponse) {}
+}
+
+// Reservation entity
+message Reservation {
+  string id = 1;
+  string concert_id = 2;
+  string customer_name = 3;
+  string customer_email = 4;
+  string seat_tier = 5;
+  int32 seat_quantity = 6;
+  bool includes_after_party = 7;
+  int32 after_party_tickets = 8;
+  double total_price = 9;
+  string reservation_date = 10;
+  string payment_method = 11;
+  ReservationStatus status = 12;
+}
+
+// Reservation status enum
+enum ReservationStatus {
+  PENDING = 0;
+  CONFIRMED = 1;
+  CANCELLED = 2;
+}
+
+// Request to make a reservation
+message ReservationRequest {
+  string concert_id = 1;
+  string customer_name = 2;
+  string customer_email = 3;
+  string seat_tier = 4;
+  int32 seat_quantity = 5;
+  bool includes_after_party = 6;
+  int32 after_party_tickets = 7;
+  string payment_method = 8;
+}
+
+// Response with reservation details
+message ReservationResponse {
+  Reservation reservation = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+// Request for a specific reservation by ID
+message ReservationIdRequest {
+  string reservation_id = 1;
+}
+
+// Generic status response (reused from concert.proto)
+message StatusResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Request for bulk reservation (for event coordinators)
+message BulkReservationRequest {
+  string concert_id = 1;
+  string group_name = 2;
+  string coordinator_email = 3;
+  string seat_tier = 4;
+  int32 seat_quantity = 5;
+  bool includes_after_party = 6;
+  int32 after_party_tickets = 7;
+  string payment_method = 8;
+}
+
+// Response for bulk reservation
+message BulkReservationResponse {
+  Reservation reservation = 1;
+  bool success = 2;
+  string message = 3;
+}
